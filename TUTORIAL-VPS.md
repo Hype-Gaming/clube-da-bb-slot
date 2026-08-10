@@ -170,11 +170,86 @@ vem depois do primeiro deploy, quando já existe um processo para salvar.
 
 ## Passo 5 — Nginx `[vps]`
 
-Copie o arquivo [deploy/nginx-clube-slots.conf](deploy/nginx-clube-slots.conf) do
-repositório para a VPS (ou cole o conteúdo à mão):
+O repositório ainda não foi enviado nesse ponto, então cole o conteúdo à mão:
 
 ```bash
 nano /etc/nginx/sites-available/slotpremiado
+```
+
+Conteúdo completo (é o mesmo de
+[deploy/nginx-clube-slots.conf](deploy/nginx-clube-slots.conf)):
+
+```nginx
+upstream clube_slots {
+    server 127.0.0.1:3000;
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name slotpremiado.com www.slotpremiado.com;
+
+    root /var/www/clube-slots/current/.output/public;
+
+    access_log /var/log/nginx/slotpremiado.access.log;
+    error_log  /var/log/nginx/slotpremiado.error.log;
+
+    client_max_body_size 2m;
+
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css application/javascript application/json
+               image/svg+xml application/manifest+json;
+
+    # Assets com hash no nome: servidos direto do disco, sem passar pelo Node.
+    location /_nuxt/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+        try_files $uri =404;
+    }
+
+    # O service worker precisa ser revalidado sempre, senão o PWA congela
+    # numa versão antiga e o autoUpdate nunca dispara.
+    location = /sw.js {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        expires off;
+        try_files $uri @nuxt;
+    }
+
+    location = /manifest.webmanifest {
+        add_header Cache-Control "no-cache";
+        expires off;
+        try_files $uri @nuxt;
+    }
+
+    location / {
+        try_files $uri @nuxt;
+    }
+
+    location @nuxt {
+        proxy_pass http://clube_slots;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host  $host;
+        proxy_set_header Upgrade           $http_upgrade;
+        proxy_set_header Connection        "";
+
+        proxy_connect_timeout 5s;
+        proxy_read_timeout    60s;
+        proxy_buffering       off;
+    }
+
+    add_header X-Frame-Options        "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff"    always;
+    add_header Referrer-Policy        "strict-origin-when-cross-origin" always;
+}
 ```
 
 Ative e valide:
@@ -237,14 +312,21 @@ Na aba **Variables** (não Secrets), adicione:
 
 ## Passo 7 — Primeiro deploy
 
+O remote já está configurado para
+`https://github.com/Hype-Gaming/clube-da-bb-slot.git`. Confira e envie:
+
 ```bash
 # [local]
+git remote -v          # deve mostrar origin -> Hype-Gaming/clube-da-bb-slot
+git status             # confira o que vai subir
+
 git add -A
 git commit -m "Configura pipeline de deploy para a VPS"
-git branch -M main
-git remote add origin git@github.com:SEU_USUARIO/SEU_REPO.git
 git push -u origin main
 ```
+
+> Faça isso **depois** dos secrets do Passo 6. Se der push antes, o workflow roda
+> e falha na etapa de SSH — sem estragar nada, mas com o job vermelho.
 
 Acompanhe em **Actions → Deploy VPS**. O workflow vai:
 
