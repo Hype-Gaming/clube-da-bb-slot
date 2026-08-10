@@ -1,0 +1,105 @@
+name: Deploy VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Um deploy por vez. Não cancelamos o que está em andamento: abortar no meio do
+# rsync deixaria uma release pela metade na VPS.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build, testa e publica
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Build inclui o typecheck (typescript.typeCheck: true no nuxt.config).
+      - name: Build de produção
+        run: npm run build
+
+      - name: Instalar Chromium do Playwright
+        run: npx playwright install --with-deps chromium
+
+      # Gate: nada vai para a VPS se o E2E quebrar.
+      # Escape hatch enquanto a suíte não estiver verde: defina a variável de
+      # repositório SKIP_E2E=true (Settings > Variables). Remova depois.
+      - name: Testes E2E
+        if: vars.SKIP_E2E != 'true'
+        run: npm run test:e2e
+
+      - name: Publicar screenshots em caso de falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: test-results/
+          retention-days: 7
+
+      - name: Configurar SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          if [ -n "$SSH_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            echo "AVISO: secret SSH_KNOWN_HOSTS ausente — confiando no keyscan (TOFU)."
+            ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          fi
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Enviar release para a VPS
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          RELEASE: ${{ github.sha }}
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -p $SSH_PORT"
+          TARGET="$DEPLOY_PATH/releases/$RELEASE"
+
+          ssh $SSH_OPTS "$SSH_USER@$SSH_HOST" "mkdir -p '$TARGET'"
+
+          # O .output do Nitro é autocontido: já traz as deps de runtime,
+          # então a VPS não precisa de npm ci nem das devDependencies.
+          rsync -az --delete --rsh="ssh $SSH_OPTS" \
+            .output "$SSH_USER@$SSH_HOST:$TARGET/"
+
+          rsync -az --rsh="ssh $SSH_OPTS" \
+            ecosystem.config.cjs "$SSH_USER@$SSH_HOST:$TARGET/"
+
+      - name: Ativar release e recarregar PM2
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          HEALTH_URL: ${{ vars.HEALTH_URL || 'http://127.0.0.1:3000/' }}
+          RELEASE: ${{ github.sha }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+            "DEPLOY_PATH='$DEPLOY_PATH' RELEASE='$RELEASE' HEALTH_URL='$HEALTH_URL' bash -s" \
+            < deploy/activate.sh
+
+      - name: Limpar credenciais
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
