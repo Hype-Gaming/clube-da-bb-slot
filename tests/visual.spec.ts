@@ -30,7 +30,7 @@ test('login usa o contrato /api/auth/login', async ({ page }) => {
       await route.fulfill({
         status: 204,
         headers: {
-          'access-control-allow-origin': 'http://127.0.0.1:4180',
+          'access-control-allow-origin': 'http://127.0.0.1:4190',
           'access-control-allow-methods': 'POST, OPTIONS',
           'access-control-allow-headers': 'content-type, x-brand-slug, x-base-domain'
         }
@@ -41,7 +41,7 @@ test('login usa o contrato /api/auth/login', async ({ page }) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      headers: { 'access-control-allow-origin': 'http://127.0.0.1:4180' },
+      headers: { 'access-control-allow-origin': 'http://127.0.0.1:4190' },
       body: JSON.stringify({
         access_token: 'test-token',
         cookie_key: 'test-cookie',
@@ -78,6 +78,65 @@ test('catálogo responsivo e busca', async ({ browser }) => {
     await page.screenshot({ path: `test-results/catalog-${viewport.width}.png`, fullPage: true })
     await page.close()
   }
+})
+
+test('saldo da carteira e depósito PIX usam o contrato da API', async ({ page }) => {
+  await page.addInitScript(value => localStorage.setItem('esportiva-slots_auth', value), session)
+  await page.route('**/api/auth/user', route => route.fulfill(route.request().method() === 'OPTIONS'
+    ? {
+        status: 204,
+        headers: {
+          'access-control-allow-origin': 'http://127.0.0.1:4190',
+          'access-control-allow-methods': 'GET, OPTIONS',
+          'access-control-allow-headers': 'authorization, x-brand-slug, x-base-domain, x-cactus-cookie-key'
+        }
+      }
+    : {
+        status: 200,
+        contentType: 'application/json',
+        headers: { 'access-control-allow-origin': 'http://127.0.0.1:4190' },
+        body: JSON.stringify({ id: 123, name: 'Visitante', wallet: { credit: 12345 } })
+      }))
+
+  let depositBody: Record<string, unknown> | undefined
+  await page.route('**/api/deposit', async route => {
+    if (route.request().method() === 'OPTIONS') {
+      await route.fulfill({
+        status: 204,
+        headers: {
+          'access-control-allow-origin': 'http://127.0.0.1:4190',
+          'access-control-allow-methods': 'POST, OPTIONS',
+          'access-control-allow-headers': 'authorization, content-type, x-brand-slug, x-base-domain, x-cactus-cookie-key'
+        }
+      })
+      return
+    }
+    depositBody = route.request().postDataJSON()
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { 'access-control-allow-origin': 'http://127.0.0.1:4190' },
+      body: JSON.stringify({
+        success: true,
+        transaction_id: 'pix-test-123',
+        qr_code: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==',
+        br_code: '00020126580014br.gov.bcb.pix-test',
+        amount: 20,
+        amount_cents: 2000,
+        user_id: 123
+      })
+    })
+  })
+
+  await page.goto('/')
+  await expect(page.getByText('R$ 123,45')).toBeVisible()
+  await page.getByRole('button', { name: 'Depositar' }).click()
+  await page.getByLabel('Valor do depósito').fill('20')
+  await page.getByRole('button', { name: 'Gerar PIX' }).click()
+
+  expect(depositBody).toEqual({ amount: 20 })
+  await expect(page.getByAltText('QR Code do depósito PIX')).toBeVisible()
+  await expect(page.getByLabel('Código PIX copia e cola')).toHaveValue('00020126580014br.gov.bcb.pix-test')
 })
 
 test('player em iframe e rota desconhecida sem fallback', async ({ browser }) => {

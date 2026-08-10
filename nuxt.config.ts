@@ -52,7 +52,7 @@ export default defineNuxtConfig({
       ]
     },
     workbox: {
-      cacheId: 'esportiva-slots-v2',
+      cacheId: 'esportiva-slots-v3',
       navigateFallback: null,
       runtimeCaching: [
         {

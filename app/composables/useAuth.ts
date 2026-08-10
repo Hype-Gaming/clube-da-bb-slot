@@ -2,6 +2,11 @@ type AuthUser = {
   id?: string | number
   name?: string
   email?: string
+  wallet?: {
+    balance?: number | string
+    credit?: number | string
+    available_value?: number | string
+  }
 }
 
 type AuthSession = {
@@ -66,9 +71,9 @@ export const useAuth = () => {
     if (!token) throw new Error(response?.message || 'Não foi possível iniciar sua sessão.')
     session.value = {
       token,
-      cookieKey: payload?.cookie_key || payload?.cookieKey || '',
+      cookieKey: String(payload?.cookie_key || payload?.cookieKey || ''),
       user: payload?.user || payload?.customer || null,
-      balance: toBalance(payload?.balance ?? payload?.user?.balance)
+      balance: extractBalance(payload)
     }
     persist()
     return session.value
@@ -99,10 +104,10 @@ export const useAuth = () => {
 
   async function refreshAccount() {
     if (!session.value.token) return
-    const response = await authorizedFetch<any>('/api/me')
+    const response = await authorizedFetch<any>('/api/auth/user')
     const payload = response?.payload || response?.data || response
     session.value.user = payload?.user || payload || session.value.user
-    session.value.balance = toBalance(payload?.balance ?? payload?.user?.balance ?? session.value.balance)
+    session.value.balance = extractBalance(payload) ?? session.value.balance
     persist()
   }
 
@@ -118,4 +123,17 @@ export const useAuth = () => {
 function toBalance(value: unknown): number | null {
   const number = Number(value)
   return Number.isFinite(number) ? number : null
+}
+
+function extractBalance(payload: any): number | null {
+  const source = payload?.user || payload
+  const credit = toBalance(source?.wallet?.credit)
+  if (credit != null) return credit / 100
+
+  return toBalance(
+    source?.wallet?.balance
+      ?? source?.wallet?.available_value
+      ?? payload?.balance
+      ?? source?.balance
+  )
 }

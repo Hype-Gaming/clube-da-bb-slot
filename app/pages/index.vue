@@ -7,7 +7,15 @@ const { session, refreshAccount } = useAuth()
 const depositOpen = ref(false)
 const featured = slots.find(slot => slot.featured)
 
-onMounted(() => refreshAccount().catch(() => {}))
+function updateAccount() {
+  refreshAccount().catch((error) => console.warn('Não foi possível atualizar o saldo.', error))
+}
+
+onMounted(() => {
+  updateAccount()
+  window.addEventListener('focus', updateAccount)
+})
+onBeforeUnmount(() => window.removeEventListener('focus', updateAccount))
 </script>
 
 <template>

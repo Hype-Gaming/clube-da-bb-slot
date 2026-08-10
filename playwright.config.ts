@@ -14,15 +14,15 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   use: {
-    baseURL: 'http://127.0.0.1:4180',
+    baseURL: 'http://127.0.0.1:4190',
     browserName: 'chromium',
     serviceWorkers: 'block',
     ...(executablePath ? { launchOptions: { executablePath } } : {})
   },
   webServer: {
     command: 'node .output/server/index.mjs',
-    url: 'http://127.0.0.1:4173',
-    env: { HOST: '127.0.0.1', PORT: '4173' },
+    url: 'http://127.0.0.1:4190',
+    env: { HOST: '127.0.0.1', PORT: '4190' },
     reuseExistingServer: !process.env.CI,
     timeout: 120_000
   }
