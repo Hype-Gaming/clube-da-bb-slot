@@ -15,7 +15,7 @@ export const slots: SlotDefinition[] = [
   {
     id: 'fortune-tiger',
     name: 'Fortune Tiger',
-    slug: 'fortune-tiger',
+    slug: 'pgsoft/fortune-tiger',
     image: '/slots/Fortune Tiger.png',
     heroImage: '/slots/Fortune Tiger.png',
     enabled: true,
@@ -26,16 +26,18 @@ export const slots: SlotDefinition[] = [
   {
     id: 'fortune-mouse',
     name: 'Fortune Mouse',
+    slug: 'pgsoft/fortune-mouse',
     image: '/slots/Fortune mouse.png',
-    enabled: false,
+    enabled: true,
     palette: ['#f6b742', '#91410e'],
     symbol: '鼠'
   },
   {
     id: 'fortune-rabbit',
     name: 'Fortune Rabbit',
+    slug: 'pgsoft/fortune-rabbit',
     image: '/slots/Fortune Rabbit.png',
-    enabled: false,
+    enabled: true,
     palette: ['#ff8a9b', '#a92562'],
     symbol: '兔'
   },
