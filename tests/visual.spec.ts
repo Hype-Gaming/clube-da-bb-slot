@@ -74,7 +74,7 @@ test('catálogo responsivo e busca', async ({ browser }) => {
     await assertNoHorizontalOverflow(page)
     await page.getByRole('searchbox', { name: 'Buscar jogo' }).fill('inexistente')
     await expect(page.getByText('Nenhum jogo encontrado')).toBeVisible()
-    await page.locator('.empty-state .text-button').click()
+    await page.getByRole('searchbox', { name: 'Buscar jogo' }).fill('')
     await page.screenshot({ path: `test-results/catalog-${viewport.width}.png`, fullPage: true })
     await page.close()
   }

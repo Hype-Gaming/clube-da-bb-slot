@@ -17,7 +17,7 @@ export const slots: SlotDefinition[] = [
     name: 'Fortune Tiger',
     slug: 'fortune-tiger',
     image: '/slots/Fortune Tiger.png',
-    heroImage: '/slots/fortune-tiger-original.png',
+    heroImage: '/slots/Fortune Tiger.png',
     enabled: true,
     featured: true,
     palette: ['#f5a623', '#7b2d10'],

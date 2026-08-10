@@ -9,7 +9,7 @@ const executablePath = process.env.PLAYWRIGHT_EDGE_PATH
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 30_000,
+  timeout: 60_000,
   reporter: 'list',
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,

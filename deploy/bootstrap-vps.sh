@@ -44,20 +44,21 @@ cat <<INFO
 
 Próximos passos:
 
-1. Autorize a chave pública do deploy:
-     cat >> ~/.ssh/authorized_keys   # cole a pública do par gerado para o GitHub
+1. Autorize a chave pública do CI:
+     nano /root/.ssh/authorized_keys   # cole a pública do par gerado para o GitHub
+     chmod 700 /root/.ssh && chmod 600 /root/.ssh/authorized_keys
 
-2. Garanta que o PM2 sobe no boot (uma vez, como root ou com sudo):
-     pm2 startup
-     # rode o comando que ele imprimir, depois:
-     pm2 save
+2. Garanta que o PM2 sobe no boot:
+     pm2 startup systemd
+     # o pm2 save vem depois do primeiro deploy
 
 3. Instale o vhost do Nginx:
-     sudo cp deploy/nginx-clube-slots.conf /etc/nginx/sites-available/clube-slots
-     sudo ln -s /etc/nginx/sites-available/clube-slots /etc/nginx/sites-enabled/
-     sudo nginx -t && sudo systemctl reload nginx
-     sudo certbot --nginx -d seu-dominio.com.br
+     cp deploy/nginx-clube-slots.conf /etc/nginx/sites-available/slotpremiado
+     ln -s /etc/nginx/sites-available/slotpremiado /etc/nginx/sites-enabled/
+     nginx -t && systemctl reload nginx
+     certbot --nginx -d slotpremiado.com -d www.slotpremiado.com
 
 4. Configure os secrets no GitHub e dê push na main.
+   Ver TUTORIAL-VPS.md para o passo a passo completo.
 
 INFO
