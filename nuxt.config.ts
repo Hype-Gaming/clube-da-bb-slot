@@ -18,7 +18,6 @@ export default defineNuxtConfig({
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://routes-eb.grupoautoma.com',
       appName: process.env.NUXT_PUBLIC_APP_NAME || 'Clube da BB Slots',
-      signupUrl: process.env.NUXT_PUBLIC_SIGNUP_URL || '',
       depositUrl: process.env.NUXT_PUBLIC_DEPOSIT_URL || ''
     }
   },

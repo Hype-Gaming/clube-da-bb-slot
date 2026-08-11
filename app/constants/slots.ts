@@ -55,29 +55,11 @@ export const slots: SlotDefinition[] = [
     symbol: '龍'
   },
   {
-    id: 'golden-dragon',
-    name: 'Golden Dragon',
-    provider: 'Good Game Labs',
-    image: '/slots/dragon-gold.jpg',
-    enabled: false,
-    palette: ['#f5d35b', '#7021a9'],
-    symbol: '龍'
-  },
-  {
     id: 'golden-rabbit',
     name: 'Golden Rabbit',
     image: '',
     enabled: false,
     palette: ['#ffbd31', '#e53777'],
-    symbol: '兔'
-  },
-  {
-    id: 'magic-rabbit',
-    name: 'Magic Rabbit',
-    provider: 'Good Game Labs',
-    image: '/slots/golden-rabbit.jpg',
-    enabled: false,
-    palette: ['#48bde2', '#333bba'],
     symbol: '兔'
   }
 ]

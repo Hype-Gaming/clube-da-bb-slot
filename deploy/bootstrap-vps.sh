@@ -19,7 +19,6 @@ if [ ! -f "$ENV_FILE" ]; then
 # Runtime do Nuxt (lidos pelo ecosystem.config.cjs e injetados no PM2).
 NUXT_PUBLIC_API_BASE=https://routes-eb.grupoautoma.com
 NUXT_PUBLIC_APP_NAME=Clube Slots
-NUXT_PUBLIC_SIGNUP_URL=
 NUXT_PUBLIC_DEPOSIT_URL=
 
 # Porta interna: só o Nginx fala com o Node.

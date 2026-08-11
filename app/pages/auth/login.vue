@@ -1,7 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ layout: false })
 useHead({ title: 'Entrar' })
-const config = useRuntimeConfig()
 const route = useRoute()
 const { login } = useAuth()
 const identifier = ref('')
@@ -49,8 +48,12 @@ async function submit() {
           <template v-else>Entrar <Icon name="lucide:arrow-right" /></template>
         </button>
       </form>
-      <a v-if="config.public.signupUrl" class="signup-link" :href="config.public.signupUrl" target="_blank" rel="noopener">Criar conta na Esportiva <Icon name="lucide:external-link" /></a>
-      <p v-else class="signup-link muted">Criação de conta temporariamente indisponível</p>
+      <div class="signup-block">
+        <p>Não possui uma conta?</p>
+        <a class="signup-link" href="https://go.aff.esportiva.bet/imo5e5c7?utm_campaign=app-slots" target="_blank" rel="noopener">
+          <Icon name="lucide:circle-plus" /> Criar conta na Esportiva
+        </a>
+      </div>
       <p class="responsible-note">18+ · Jogue com responsabilidade.</p>
     </section>
   </main>
