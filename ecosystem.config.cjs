@@ -72,6 +72,8 @@ module.exports = {
         // Configurações públicas e demais segredos vêm dos arquivos .env.
         ...shared,
         NODE_ENV: 'production',
+        // Identifica processos já migrados para o layout releases/current.
+        DEPLOY_LAYOUT: 'release-symlink-v1',
         // Infraestrutura fixa: evita um .env legado recolocar o app na porta 3000.
         HOST: '127.0.0.1',
         PORT: '3020'
