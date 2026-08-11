@@ -57,8 +57,10 @@ export const slots: SlotDefinition[] = [
   {
     id: 'golden-rabbit',
     name: 'Golden Rabbit',
-    image: '',
-    enabled: false,
+    provider: 'Good Game Labs',
+    slug: 'goodgame/golden-rabbit',
+    image: '/slots/golden-rabbit.jpg',
+    enabled: true,
     palette: ['#ffbd31', '#e53777'],
     symbol: '兔'
   }

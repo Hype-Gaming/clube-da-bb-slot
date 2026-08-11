@@ -152,6 +152,8 @@ test('player em iframe e rota desconhecida sem fallback', async ({ browser }) =>
   await page.goto('/slot/fortune-tiger', { waitUntil: 'domcontentloaded' })
   const gameFrame = page.locator('iframe[allow="autoplay; fullscreen"]')
   await expect(gameFrame).toBeVisible()
+  await expect(page.getByText('Entrada:')).toBeVisible()
+  await expect(page.locator('.signal-pill time')).toHaveText(/^\d{2}:\d{2}$/)
   await expect(gameFrame).toHaveAttribute('srcdoc', /Jogo carregado/)
   await expect(gameFrame).not.toHaveAttribute('src', /DOCTYPE/i)
   await assertNoHorizontalOverflow(page)

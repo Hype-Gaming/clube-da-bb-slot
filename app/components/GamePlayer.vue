@@ -7,8 +7,15 @@ const loaded = ref(false)
 const isHtmlDocument = computed(() => /^\s*(?:<!doctype\s+html|<html\b)/i.test(props.url))
 const frameSrc = computed(() => isHtmlDocument.value ? undefined : props.url)
 const frameSrcdoc = computed(() => isHtmlDocument.value ? props.url : undefined)
+// O documento HTML de alguns provedores (PG Soft) e so um seletor de espelho: ele
+// mede a latencia de varios dominios e faz location.replace para o jogo. O sandbox
+// sobrevive a essa navegacao, entao sem allow-same-origin o jogo carrega em origem
+// opaca — sem localStorage, sem cookies e com Origin: null no WebSocket — e o
+// provedor recusa a sessao (G1002).
+// Com allow-scripts junto, o allow-same-origin torna o sandbox burlavel pelo proprio
+// frame; ele fica aqui pelo que ainda barra, como navegar a janela de topo.
 const frameSandbox = computed(() => isHtmlDocument.value
-  ? 'allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-orientation-lock'
+  ? 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-orientation-lock'
   : undefined)
 
 function reload() {
