@@ -10,8 +10,9 @@ set -euo pipefail
 DEPLOY_PATH="${DEPLOY_PATH:?DEPLOY_PATH não definido}"
 RELEASE="${RELEASE:?RELEASE não definido}"
 KEEP_RELEASES="${KEEP_RELEASES:-5}"
-HEALTH_URL="${HEALTH_URL:-http://127.0.0.1:3000/}"
+HEALTH_URL="${HEALTH_URL:-http://127.0.0.1:3020/api/health}"
 HEALTH_RETRIES="${HEALTH_RETRIES:-15}"
+EXPECTED_HEALTH_RESPONSE="clube-slots:ok"
 
 RELEASE_DIR="$DEPLOY_PATH/releases/$RELEASE"
 ECOSYSTEM="$DEPLOY_PATH/ecosystem.config.cjs"
@@ -46,11 +47,13 @@ activate "$RELEASE_DIR"
 log "Health check em $HEALTH_URL"
 healthy=0
 for attempt in $(seq 1 "$HEALTH_RETRIES"); do
-  if curl -fsS -o /dev/null --max-time 5 "$HEALTH_URL"; then
+  response="$(curl -fsS --max-time 5 "$HEALTH_URL" 2>/dev/null || true)"
+  if [ "$response" = "$EXPECTED_HEALTH_RESPONSE" ]; then
     healthy=1
     echo "OK na tentativa $attempt"
     break
   fi
+  echo "Tentativa $attempt: resposta inválida ou serviço indisponível."
   sleep 2
 done
 

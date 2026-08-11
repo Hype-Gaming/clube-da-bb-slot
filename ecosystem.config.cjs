@@ -39,7 +39,12 @@ function readEnvFile(file) {
   return parsed
 }
 
-const shared = readEnvFile(path.join(ROOT, 'shared', '.env'))
+// Mantém compatibilidade com a instalação antiga, que guardava o .env na raiz.
+// Quando shared/.env existir, seus valores têm prioridade.
+const shared = {
+  ...readEnvFile(path.join(ROOT, '.env')),
+  ...readEnvFile(path.join(ROOT, 'shared', '.env'))
+}
 
 module.exports = {
   apps: [
@@ -64,12 +69,12 @@ module.exports = {
       out_file: path.join(ROOT, 'logs', 'out.log'),
       error_file: path.join(ROOT, 'logs', 'error.log'),
       env: {
+        // Configurações públicas e demais segredos vêm dos arquivos .env.
+        ...shared,
         NODE_ENV: 'production',
-        // Só o Nginx fala com o Node; nada exposto direto na internet.
+        // Infraestrutura fixa: evita um .env legado recolocar o app na porta 3000.
         HOST: '127.0.0.1',
-        PORT: '3000',
-        // Valores do shared/.env vencem os defaults acima.
-        ...shared
+        PORT: '3020'
       }
     }
   ]

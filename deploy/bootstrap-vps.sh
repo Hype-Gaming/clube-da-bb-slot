@@ -23,7 +23,7 @@ NUXT_PUBLIC_DEPOSIT_URL=
 
 # Porta interna: só o Nginx fala com o Node.
 HOST=127.0.0.1
-PORT=3000
+PORT=3020
 
 # Ajuste conforme os cores da VPS ('max' não é suportado aqui, use um número).
 PM2_INSTANCES=2
