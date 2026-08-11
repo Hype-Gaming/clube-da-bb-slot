@@ -4,7 +4,10 @@ import { useSlotCatalog } from '~/composables/useSlots'
 useHead({ title: 'Jogos' })
 const { query, filteredSlots, slots } = useSlotCatalog()
 const { session, refreshAccount } = useAuth()
+const route = useRoute()
+const router = useRouter()
 const depositOpen = ref(false)
+const promotionOpen = ref(false)
 const featured = slots.find(slot => slot.featured)
 
 function updateAccount() {
@@ -14,6 +17,10 @@ function updateAccount() {
 onMounted(() => {
   updateAccount()
   window.addEventListener('focus', updateAccount)
+  if (route.query.promotion === '1') {
+    promotionOpen.value = true
+    router.replace({ path: '/' })
+  }
 })
 onBeforeUnmount(() => window.removeEventListener('focus', updateAccount))
 </script>
@@ -47,5 +54,6 @@ onBeforeUnmount(() => window.removeEventListener('focus', updateAccount))
     </main>
     <footer><span>Clube da BB Slots</span><p>Jogue com responsabilidade. Proibido para menores de 18 anos.</p><span>{{ session.user?.name ? `Conta de ${session.user.name.split(' ')[0]}` : 'Esportiva' }}</span></footer>
     <DepositModal :open="depositOpen" @close="depositOpen = false" />
+    <PromotionModal :open="promotionOpen" @close="promotionOpen = false" />
   </div>
 </template>

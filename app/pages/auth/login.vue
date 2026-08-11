@@ -18,7 +18,7 @@ async function submit() {
   loading.value = true
   try {
     await login(identifier.value, password.value)
-    await navigateTo('/')
+    await navigateTo('/?promotion=1')
   } catch (error: any) {
     errorMessage.value = error?.data?.message || error?.message || 'Não foi possível entrar. Confira seus dados.'
   } finally {

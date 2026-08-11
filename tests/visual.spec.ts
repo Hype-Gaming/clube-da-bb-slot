@@ -55,6 +55,7 @@ test('login usa o contrato /api/auth/login', async ({ page }) => {
   await page.locator('#password').fill('senha-segura')
   await page.getByRole('button', { name: 'Entrar' }).click()
   await expect(page).toHaveURL('/')
+  await expect(page.getByRole('heading', { name: 'Seu próximo jogo pode estar a um clique' })).toBeVisible()
   expect(requestBody).toMatchObject({
     email: 'teste@example.com',
     brand_slug: 'esportiva',
