@@ -4,6 +4,12 @@ const frame = ref<HTMLIFrameElement | null>(null)
 const wrapper = ref<HTMLElement | null>(null)
 const frameKey = ref(0)
 const loaded = ref(false)
+const isHtmlDocument = computed(() => /^\s*(?:<!doctype\s+html|<html\b)/i.test(props.url))
+const frameSrc = computed(() => isHtmlDocument.value ? undefined : props.url)
+const frameSrcdoc = computed(() => isHtmlDocument.value ? props.url : undefined)
+const frameSandbox = computed(() => isHtmlDocument.value
+  ? 'allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-orientation-lock'
+  : undefined)
 
 function reload() {
   loaded.value = false
@@ -21,7 +27,9 @@ async function fullscreen() {
     <iframe
       :key="frameKey"
       ref="frame"
-      :src="props.url"
+      :src="frameSrc"
+      :srcdoc="frameSrcdoc"
+      :sandbox="frameSandbox"
       :title="title"
       allow="autoplay; fullscreen"
       allowfullscreen

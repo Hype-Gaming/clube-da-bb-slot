@@ -29,9 +29,9 @@ async function startGame() {
       method: 'GET',
       query: { slug: slot.value.slug, platform: platform(), use_demo: 0 }
     })
-    const url = response?.game_url || response?.payload?.gameURL
-    if (!url || typeof url !== 'string') throw new Error('A operadora não retornou uma URL válida para o jogo.')
-    gameUrl.value = url
+    const source = response?.game_url || response?.payload?.gameURL
+    if (!isPlayableSource(source)) throw new Error('A operadora não retornou um launcher válido para o jogo.')
+    gameUrl.value = source
   } catch (error: any) {
     errorMessage.value = error?.data?.message || error?.message || 'Não foi possível abrir o jogo agora.'
   } finally {
@@ -40,6 +40,16 @@ async function startGame() {
 }
 
 onMounted(startGame)
+
+function isPlayableSource(source: unknown): source is string {
+  if (typeof source !== 'string' || !source.trim()) return false
+  if (/^\s*(?:<!doctype\s+html|<html\b)/i.test(source)) return true
+  try {
+    return ['https:', 'http:', 'data:', 'blob:'].includes(new URL(source).protocol)
+  } catch {
+    return false
+  }
+}
 </script>
 
 <template>

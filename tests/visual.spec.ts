@@ -147,14 +147,17 @@ test('player em iframe e rota desconhecida sem fallback', async ({ browser }) =>
     status: 200,
     contentType: 'application/json',
     headers: { 'access-control-allow-origin': '*' },
-    body: JSON.stringify({ game_url: 'data:text/html,<title>Slot test</title><body style="background:%23120d08;color:white">Jogo carregado</body>' })
+    body: JSON.stringify({ game_url: '<!DOCTYPE html><html><head><title>Slot test</title></head><body style="background:#120d08;color:white">Jogo carregado</body></html>' })
   }))
-  await page.goto('/slot/fortune-tiger')
-  await expect(page.locator('iframe[allow="autoplay; fullscreen"]')).toBeVisible()
+  await page.goto('/slot/fortune-tiger', { waitUntil: 'domcontentloaded' })
+  const gameFrame = page.locator('iframe[allow="autoplay; fullscreen"]')
+  await expect(gameFrame).toBeVisible()
+  await expect(gameFrame).toHaveAttribute('srcdoc', /Jogo carregado/)
+  await expect(gameFrame).not.toHaveAttribute('src', /DOCTYPE/i)
   await assertNoHorizontalOverflow(page)
   await page.screenshot({ path: 'test-results/player-mobile.png', fullPage: true })
 
-  await page.goto('/slot/nao-existe')
+  await page.goto('/slot/nao-existe', { waitUntil: 'domcontentloaded' })
   await expect(page.getByRole('heading', { name: 'Jogo não encontrado' })).toBeVisible()
   await expect(page.locator('iframe')).toHaveCount(0)
 })
