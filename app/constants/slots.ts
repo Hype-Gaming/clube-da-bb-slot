@@ -15,6 +15,7 @@ export const slots: SlotDefinition[] = [
   {
     id: 'fortune-tiger',
     name: 'Fortune Tiger',
+    provider: 'PG Soft',
     slug: 'pgsoft/fortune-tiger',
     image: '/slots/Fortune Tiger.png',
     heroImage: '/slots/Fortune Tiger.png',
@@ -26,6 +27,7 @@ export const slots: SlotDefinition[] = [
   {
     id: 'fortune-mouse',
     name: 'Fortune Mouse',
+    provider: 'PG Soft',
     slug: 'pgsoft/fortune-mouse',
     image: '/slots/Fortune mouse.png',
     enabled: true,
@@ -35,6 +37,7 @@ export const slots: SlotDefinition[] = [
   {
     id: 'fortune-rabbit',
     name: 'Fortune Rabbit',
+    provider: 'PG Soft',
     slug: 'pgsoft/fortune-rabbit',
     image: '/slots/Fortune Rabbit.png',
     enabled: true,
@@ -42,9 +45,20 @@ export const slots: SlotDefinition[] = [
     symbol: '兔'
   },
   {
+    id: 'fortune-dragon',
+    name: 'Fortune Dragon',
+    provider: 'PG Soft',
+    slug: 'pgsoft/fortune-dragon',
+    image: '/slots/dragon-fortune.png',
+    enabled: true,
+    palette: ['#ffb72b', '#6d199d'],
+    symbol: '龍'
+  },
+  {
     id: 'golden-dragon',
     name: 'Golden Dragon',
-    image: '',
+    provider: 'Good Game Labs',
+    image: '/slots/dragon-gold.jpg',
     enabled: false,
     palette: ['#f5d35b', '#7021a9'],
     symbol: '龍'
@@ -60,7 +74,8 @@ export const slots: SlotDefinition[] = [
   {
     id: 'magic-rabbit',
     name: 'Magic Rabbit',
-    image: '',
+    provider: 'Good Game Labs',
+    image: '/slots/golden-rabbit.jpg',
     enabled: false,
     palette: ['#48bde2', '#333bba'],
     symbol: '兔'
