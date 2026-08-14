@@ -30,7 +30,7 @@ onBeforeUnmount(() => window.removeEventListener('focus', updateAccount))
     <AppHeader @deposit="depositOpen = true" />
     <main class="home-content">
       <section v-if="featured" class="hero">
-        <img :src="featured.heroImage || featured.image" alt="Arte ilustrativa original de um tigre dourado">
+        <img src="/banner-clube-da-bb.png" alt="Banner Clube da BB">
         <div class="hero-shade" />
         <div class="hero-copy">
           <p class="eyebrow"><span /> Destaque da semana</p>
