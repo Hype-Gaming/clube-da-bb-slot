@@ -23,4 +23,12 @@
 .card-art>img{object-position:center}
 .app-header{background:#09090bec}.search-box:focus-within{border-color:#ff2f9299;box-shadow:0 0 0 3px #ff2f9218}.play-overlay>span{background:linear-gradient(135deg,#ff85bd,#ee197c);color:#260415}.login-page{background:radial-gradient(circle at 50% 110%,#3b0b26 0,transparent 36%),#09090b}.glow-one{background:#ff1493}.glow-two{background:#9f0a58}.login-panel{border-color:#ff4d9c25;background:#131216ee}.login-panel>.brand-lockup{margin-bottom:28px}.login-panel>.brand-lockup>img{width:90px;height:90px}.field-wrap:focus-within{border-color:#ff4d9c;box-shadow:0 0 0 3px #ff149318}.modal-icon,.player-title>span,.status-icon{background:#ff2f9218}
 @media(max-width:620px){.brand-lockup>img{width:46px;height:46px}.login-panel>.brand-lockup>img{width:82px;height:82px}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation-duration:.01ms!important}}
+/* Banner do grupo de WhatsApp: a arte ja traz texto e CTA, entao o link e so a
+   imagem. height:auto preserva a proporcao nativa e evita o corte do object-fit. */
+.promo-banner{display:block;margin-top:34px;line-height:0;overflow:hidden;border:1px solid #ffffff12;border-radius:22px;transition:transform .35s,box-shadow .35s}
+.promo-banner>img{display:block;width:100%;height:auto}
+.promo-banner:hover{transform:translateY(-2px);box-shadow:0 16px 36px #000000a6}
+.promo-banner:focus-visible{outline:2px solid #ff1493;outline-offset:3px}
+@media(max-width:620px){.promo-banner{margin-top:22px;border-radius:16px}}
+
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation-duration:.01ms!important}.promo-banner:hover{transform:none}}

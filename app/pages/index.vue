@@ -41,6 +41,21 @@ onBeforeUnmount(() => window.removeEventListener('focus', updateAccount))
         <small>Arte original ilustrativa</small>
       </section>
 
+      <a
+        class="promo-banner"
+        href="https://chat.whatsapp.com/KUF3iGjMcJIFztalOOAE97?s=sw&p=i&mlu=0&ilr=4"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="/banners/slot-bbanner-slot.png"
+          alt="Sorteio diário no WhatsApp. Participe do grupo."
+          width="2500"
+          height="868"
+          loading="lazy"
+        >
+      </a>
+
       <section class="catalog-section">
         <div class="catalog-heading">
           <div><p class="eyebrow">Explore</p><h2>Todos os jogos</h2></div>
